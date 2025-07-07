@@ -1,0 +1,68 @@
+# -*- coding: utf-8 -*-
+"""Versión modificada de convolucion.py"""
+
+# Importamos las bibliotecas necesarias
+import numpy as np                  # Para operaciones matemáticas y manejo de arreglos
+import matplotlib.pyplot as plt    # Para generar las gráficas
+
+# --- PARÁMETROS GENERALES ---
+
+frecuencia_muestreo = 1000  # Frecuencia de muestreo en Hz (número de muestras por segundo)
+duracion_segundos = 1       # Duración total de la señal en segundos
+
+# Creamos el vector de tiempo con valores desde 0 hasta duracion_segundos (sin incluir el final)
+tiempo = np.linspace(0, duracion_segundos, int(frecuencia_muestreo * duracion_segundos), endpoint=False)
+
+# --- SEÑAL BASE ---
+
+frecuencia_base = 50  # Frecuencia de la señal base en Hz
+# Generamos una señal senoidal con frecuencia de 50 Hz
+senal_base = np.sin(2 * np.pi * frecuencia_base * tiempo)
+
+# --- FRECUENCIAS ADICIONALES PARA CONVOLUCIÓN ---
+
+frecs_adicionales = [100, 200, 300]  # Lista con las frecuencias adicionales a comparar
+
+# Preparamos una figura con tamaño grande para visualizar múltiples subgráficas
+plt.figure(figsize=(12, 12))
+
+# Iteramos sobre las frecuencias adicionales con su índice
+for indice, frecuencia_actual in enumerate(frecs_adicionales):
+
+    # Generamos una señal senoidal con la frecuencia actual
+    senal_actual = np.sin(2 * np.pi * frecuencia_actual * tiempo)
+
+    # Calculamos la convolución entre la señal base y la señal actual
+    # Usamos el modo 'same' para que la salida tenga el mismo tamaño que la entrada
+    resultado_convolucion = np.convolve(senal_base, senal_actual, mode='same')
+
+    # Calculamos la posición de inicio de las subgráficas para esta frecuencia
+    posicion = indice * 3 + 1
+
+    # --- GRAFICAR SEÑAL BASE ---
+    plt.subplot(len(frecs_adicionales) * 3, 1, posicion)
+    plt.plot(tiempo, senal_base)
+    plt.title(f'[F = {frecuencia_actual} Hz] Señal base ({frecuencia_base} Hz)')
+    plt.ylabel('Amplitud')
+    plt.grid(True)
+
+    # --- GRAFICAR SEÑAL ACTUAL ---
+    plt.subplot(len(frecs_adicionales) * 3, 1, posicion + 1)
+    plt.plot(tiempo, senal_actual)
+    plt.title(f'[F = {frecuencia_actual} Hz] Señal modificada ({frecuencia_actual} Hz)')
+    plt.ylabel('Amplitud')
+    plt.grid(True)
+
+    # --- GRAFICAR RESULTADO DE LA CONVOLUCIÓN ---
+    plt.subplot(len(frecs_adicionales) * 3, 1, posicion + 2)
+    plt.plot(tiempo, resultado_convolucion)
+    plt.title(f'[F = {frecuencia_actual} Hz] Resultado de la convolución ({frecuencia_base} Hz vs {frecuencia_actual} Hz)')
+    plt.xlabel('Tiempo [s]')
+    plt.ylabel('Amplitud')
+    plt.grid(True)
+
+# Ajusta automáticamente los espacios entre subgráficas para que no se sobrepongan
+plt.tight_layout()
+
+# Muestra toda la figura con las gráficas
+plt.show()
